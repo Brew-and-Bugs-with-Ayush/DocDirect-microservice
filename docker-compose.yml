@@ -1,0 +1,128 @@
+services:
+
+  docdirect-patient-db:
+    image: postgres:latest
+    container_name: DocDirect-Patient-DB
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: db
+    ports:
+      - "5000:5432"
+    volumes:
+      - docdirect-patient-db-data:/var/lib/postgresql/data
+    networks:
+      - docdirect-internal
+
+  docdirect-auth-db:
+    image: postgres:latest
+    container_name: DocDirect-Auth-DB
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: db
+    ports:
+      - "5001:5432"
+    volumes:
+      - docdirect-auth-db-data:/var/lib/postgresql/data
+    networks:
+      - docdirect-internal
+
+  docdirect-kafka:
+    image:  docker.io/bitnamilegacy/kafka:latest
+    container_name: DocDirect-Kafka
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://docdirect-kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@docdirect-kafka:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    networks:
+      - docdirect-internal
+
+  # Microservices-------
+
+  docdirect-patient-service:
+    image: codexayush04/docdirect:patient-service-latest
+    container_name: DocDirect-Patient-Service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://docdirect-patient-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      SPRINGDOC_SWAGGER-UI_ENABLED: true
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: docdirect-kafka:9092
+      billing.service.address: docdirect-billing-service
+      billing.service.grpc.port: 50051
+      SERVER_PORT: 8090
+    ports:
+      - "8090:8090"
+    networks:
+      - docdirect-internal
+
+  docdirect-billing-service:
+    image: codexayush04/docdirect:billing-service-latest
+    container_name: DocDirect-Billing-Service
+    environment:
+      SERVER_PORT: 8082
+      GRPC_SERVER_PORT: 50051
+    ports:
+      - "8082:8082"
+      - "50051:50051"
+    networks:
+      - docdirect-internal
+
+  docdirect-analytics-service:
+    image: codexayush04/docdirect:analytics-service-latest
+    container_name: DocDirect-Analytics-Service
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: docdirect-kafka:9092
+    ports:
+      - "8087:8087"
+    networks:
+      - docdirect-internal
+
+  docdirect-api-gateway:
+    image: codexayush04/docdirect:api-gateway-latest
+    container_name: DocDirect-API-Gateway
+    environment:
+      AUTH_SERVICE_URL: http://docdirect-auth-service:8085
+      PATIENT_SERVICE_URL: http://docdirect-patient-service:8090
+    ports:
+      - "7000:7000"
+    depends_on:
+      - docdirect-auth-service
+      - docdirect-patient-service
+    networks:
+      - docdirect-internal
+
+  docdirect-auth-service:
+    image: codexayush04/docdirect:auth-service-latest
+    container_name: DocDirect-Auth-Service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://docdirect-auth-db:5432/db
+      SPRINGDOC_SWAGGER-UI_ENABLED: true
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      JWT_SECRET: PFgjlrvV7Za6oWgrtgHAMhyVajhWUvfO5z/DIPWK9Ec=
+    ports:
+      - "8085:8085"
+    networks:
+      - docdirect-internal
+
+networks:
+  docdirect-internal:
+    driver: bridge
+
+volumes:
+  docdirect-patient-db-data:
+  docdirect-auth-db-data:

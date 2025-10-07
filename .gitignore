@@ -70,17 +70,3 @@ Thumbs.db
 *.cert
 *.jks
 *.keystore
-
-# Docker
-/docker/
-/docker-compose.yml
-/docker-compose.override.yml
-
-# Kubernetes
-/k8s/
-
-# LocalStack
-.localstack/
-
-# AWS credentials
-.aws/

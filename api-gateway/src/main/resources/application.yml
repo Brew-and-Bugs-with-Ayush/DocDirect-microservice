@@ -1,0 +1,47 @@
+server:
+  port: 7000
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Auth Service
+        - id: auth-service-route
+          uri: http://docdirect-auth-service:8085
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+        # Patient Service
+        - id: patient-service-route
+          uri: http://docdirect-patient-service:8090
+          predicates:
+            - Path=/api/patients/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Swagger/OpenAPI Docs - Patient
+        - id: api-docs-patient-route
+          uri: http://docdirect-patient-service:8090
+          predicates:
+            - Path=/api-docs/patients
+          filters:
+            - RewritePath=/api-docs/patients,/v3/api-docs
+
+        # Swagger/OpenAPI Docs - Auth
+        - id: api-docs-auth-route
+          uri: http://docdirect-auth-service:8085
+          predicates:
+            - Path=/api-docs/auth
+          filters:
+            - RewritePath=/api-docs/auth,/v3/api-docs
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Patient Service
+        url: /api-docs/patients
+      - name: Auth Service
+        url: /api-docs/auth
+    path: /swagger-ui.html

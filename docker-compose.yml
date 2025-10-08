@@ -49,6 +49,7 @@ services:
   # Microservices-------
 
   docdirect-patient-service:
+    build: ./patient-service
     image: codexayush04/docdirect:patient-service-latest
     container_name: DocDirect-Patient-Service
     environment:
@@ -68,6 +69,7 @@ services:
       - docdirect-internal
 
   docdirect-billing-service:
+    build: ./billing-service
     image: codexayush04/docdirect:billing-service-latest
     container_name: DocDirect-Billing-Service
     environment:
@@ -80,6 +82,7 @@ services:
       - docdirect-internal
 
   docdirect-analytics-service:
+    build: ./analytics-service
     image: codexayush04/docdirect:analytics-service-latest
     container_name: DocDirect-Analytics-Service
     environment:
@@ -90,6 +93,7 @@ services:
       - docdirect-internal
 
   docdirect-api-gateway:
+    build: ./api-gateway
     image: codexayush04/docdirect:api-gateway-latest
     container_name: DocDirect-API-Gateway
     environment:
@@ -104,6 +108,7 @@ services:
       - docdirect-internal
 
   docdirect-auth-service:
+    build: ./auth-service
     image: codexayush04/docdirect:auth-service-latest
     container_name: DocDirect-Auth-Service
     environment:

@@ -48,6 +48,6 @@ public class SwaggerConfig {
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .externalDocs(new ExternalDocumentation()
                         .description("GitHub Repository - DocDirect")
-                        .url("https://github.com/Brew-and-Bugs-with-Ayush/DocDirect"));
+                        .url("https://github.com/Brew-and-Bugs-with-Ayush/DocDirect-microservice"));
     }
 }

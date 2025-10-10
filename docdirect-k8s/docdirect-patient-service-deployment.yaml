@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.29.0 (997957870)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: docdirect-patient-service
+  name: docdirect-patient-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: docdirect-patient-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.29.0 (997957870)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/backend-docdirect-internal: "true"
+        io.kompose.service: docdirect-patient-service
+    spec:
+      containers:
+        - env:
+            - name: SERVER_PORT
+              value: "8090"
+            - name: SPRINGDOC_SWAGGER-UI_ENABLED
+              value: "true"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password123
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://docdirect-patient-db:5432/db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: admin
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: docdirect-kafka:9092
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+            - name: billing.service.address
+              value: docdirect-billing-service
+            - name: billing.service.grpc.port
+              value: "50051"
+          image: codexayush04/docdirect:patient-service-latest
+          name: docdirect-patient-service
+          ports:
+            - containerPort: 8090
+          resources: {}
+      restartPolicy: Always
+status: {}

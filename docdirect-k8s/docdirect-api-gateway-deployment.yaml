@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.29.0 (997957870)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: docdirect-api-gateway
+  name: docdirect-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: docdirect-api-gateway
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.29.0 (997957870)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/backend-docdirect-internal: "true"
+        io.kompose.service: docdirect-api-gateway
+    spec:
+      containers:
+        - env:
+            - name: AUTH_SERVICE_URL
+              value: http://docdirect-auth-service:8085
+            - name: PATIENT_SERVICE_URL
+              value: http://docdirect-patient-service:8090
+          image: codexayush04/docdirect:api-gateway-latest
+          name: docdirect-api-gateway
+          ports:
+            - containerPort: 7000
+          resources: {}
+      restartPolicy: Always
+status: {}

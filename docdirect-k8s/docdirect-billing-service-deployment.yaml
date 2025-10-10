@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.29.0 (997957870)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: docdirect-billing-service
+  name: docdirect-billing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: docdirect-billing-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.29.0 (997957870)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/backend-docdirect-internal: "true"
+        io.kompose.service: docdirect-billing-service
+    spec:
+      containers:
+        - env:
+            - name: GRPC_SERVER_PORT
+              value: "50051"
+            - name: SERVER_PORT
+              value: "8082"
+          image: codexayush04/docdirect:billing-service-latest
+          name: docdirect-billing-service
+          ports:
+            - containerPort: 8082
+            - containerPort: 50051
+          resources: {}
+      restartPolicy: Always
+status: {}

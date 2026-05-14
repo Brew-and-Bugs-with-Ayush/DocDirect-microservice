@@ -20,23 +20,20 @@ It integrates **Spring Cloud Gateway**, **Kafka**, **gRPC**, and **PostgreSQL** 
 ---
 
 ## 🧱 Monorepo Structure
-
+```txt
 DocDirect-microservice/
-
-1. .github/workflows/ # CI/CD workflows (GitHub Actions)
-2. analytics-service/ # Handles analytics and reports
-3. api-gateway/ # Central routing using Spring Cloud Gateway
-4. api-requests/ # API aggregation & forwarding
-5. auth-service/ # JWT Authentication & Validation
-6. billing-service/ # Billing and payment module
-7. patient-service/ # Manages patient data
-8. ocdirect-k8s/ # Kubernetes manifests (Kompose generated)
-9. infrastructure/ # LocalStack AWS setup (S3, SNS, etc.)
-10. integration-tests/ # Inter-service & gRPC integration tests
-11. docker-compose.yml # Local orchestration
-12. .gitignore
-13. README.md
-
+├── github/workflows/ # CI/CD workflows (GitHub Actions)
+├── analytics-service/ # Handles analytics and reports
+├── api-gateway/ # Central routing using Spring Cloud Gateway
+├── api-requests/ # API aggregation & forwarding
+├── auth-service/ # JWT Authentication & Validation
+├── billing-service/ # Billing and payment module
+├── patient-service/ # Manages patient data
+├── docdirect-k8s/ # Kubernetes manifests (Kompose generated)
+├── infrastructure/ # LocalStack AWS setup (S3, SNS, etc.)
+├── integration-tests/ # Inter-service & gRPC integration tests
+├── docker-compose.yml # Local orchestration
+```
 ---
 
 ---
